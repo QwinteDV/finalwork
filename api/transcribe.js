@@ -1,7 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
 export const config = {
   runtime: 'edge',
 };
@@ -37,18 +35,11 @@ export default async function handler(req) {
       });
     }
 
-    // Convert to Buffer for Edge Runtime
-    const arrayBuffer = await audioFile.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
-
-    // Create a Blob from the buffer
-    const blob = new Blob([buffer], { type: audioFile.type });
-
-    // Gemini doesn't have direct audio transcription, so we'll use a mock response
-    // In production, you'd need to convert speech to text first
+    // For now, return a simple mock transcription since Gemini doesn't support direct audio
+    // You can replace this with AIMLAPI's transcription endpoint if they have one
     
     return new Response(JSON.stringify({ 
-      text: "Audio ontvangen (dit is een placeholder - Gemini heeft geen directe transcriptie API)" 
+      text: "Audio verwerkt - gebruik AIMLAPI voor echte transcriptie" 
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -56,11 +47,10 @@ export default async function handler(req) {
 
   } catch (error) {
     console.error('Transcription error:', error);
-    console.error('Error stack:', error.stack);
     
     return new Response(JSON.stringify({ 
-      error: error.message || 'Transcription failed',
-      details: error.stack?.substring(0, 200)
+      error: 'Transcription failed',
+      message: error.message
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

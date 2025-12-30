@@ -61,8 +61,11 @@ export default async function handler(req) {
 
   } catch (error) {
     console.error('Transcription error:', error);
+    console.error('Error stack:', error.stack);
+    
     return new Response(JSON.stringify({ 
-      error: error.message || 'Transcription failed' 
+      error: error.message || 'Transcription failed',
+      details: error.stack?.substring(0, 200)
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

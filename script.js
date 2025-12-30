@@ -82,11 +82,14 @@ async function transcribeAudio(audioBlob) {
             body: formData
         });
 
+        const responseText = await response.text();
+        
         if (!response.ok) {
-            throw new Error('Transcription failed');
+            console.error('API Response:', response.status, responseText);
+            throw new Error(`Transcription failed: ${responseText}`);
         }
 
-        const data = await response.json();
+        const data = JSON.parse(responseText);
         result.textContent = data.text;
         
         // Get AI response

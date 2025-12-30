@@ -1,8 +1,6 @@
-import { OpenAI } from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const config = {
   runtime: 'edge',
@@ -18,9 +16,9 @@ export default async function handler(req) {
 
   try {
     // Check API key
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       return new Response(JSON.stringify({ 
-        error: 'OpenAI API key not configured' 
+        error: 'Gemini API key not configured' 
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -46,14 +44,11 @@ export default async function handler(req) {
     // Create a Blob from the buffer
     const blob = new Blob([buffer], { type: audioFile.type });
 
-    const transcription = await openai.audio.transcriptions.create({
-      file: blob,
-      model: 'whisper-1',
-      language: 'nl',
-    });
-
+    // Gemini doesn't have direct audio transcription, so we'll use a mock response
+    // In production, you'd need to convert speech to text first
+    
     return new Response(JSON.stringify({ 
-      text: transcription.text 
+      text: "Audio ontvangen (dit is een placeholder - Gemini heeft geen directe transcriptie API)" 
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

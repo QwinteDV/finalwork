@@ -101,7 +101,11 @@ async function transcribeAudio(audioBlob) {
         status.textContent = 'Klaar om te luisteren';
 
     } catch (err) {
-        error.textContent = `Transcriptie fout: ${err.message}`;
+        if (err.message.includes('quota') || err.message.includes('429')) {
+            error.textContent = 'OpenAI credits opgeladen. Voeg credits toe aan je account.';
+        } else {
+            error.textContent = `Transcriptie fout: ${err.message}`;
+        }
         status.textContent = 'Klaar om te luisteren';
         console.error('Transcription error:', err);
     }

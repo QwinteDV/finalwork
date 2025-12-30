@@ -1,8 +1,6 @@
-import { OpenAI } from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const config = {
   runtime: 'edge',
@@ -10,33 +8,38 @@ export const config = {
 
 export default async function handler(req) {
   if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), { 
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   try {
     const { message } = await req.json();
     
     if (!message) {
-      return new Response('No message provided', { status: 400 });
+      return new Response(JSON.stringify({ error: 'No message provided' }), { 
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'system',
-          content: 'Je bent een behulpzame AI assistent die antwoord geeft in het Nederlands. Wees kort en duidelijk.'
-        },
-        {
-          role: 'user',
-          content: message
-        }
-      ],
-      max_tokens: 150,
-      temperature: 0.7,
-    });
+    if (!process.env.GEMINI_API_KEY) {
+      return new Response(JSON.stringify({ 
+        error: 'Gemini API key not configured' 
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
-    const aiResponse = completion.choices[0].message.content;
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    
+    const result = await model.generateContent(
+      `Je bent een behulpzame AI assistent die antwoord geeft in het Nederlands. Wees kort en duidelijk. Gebruiker zegt: ${message}`
+    );
+    
+    const aiResponse = result.response.text();
 
     return new Response(JSON.stringify({ 
       response: aiResponse 
@@ -48,7 +51,7 @@ export default async function handler(req) {
   } catch (error) {
     console.error('Chat error:', error);
     return new Response(JSON.stringify({ 
-      error: 'AI response failed' 
+      error: error.message || 'AI response failed' 
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

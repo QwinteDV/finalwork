@@ -4,9 +4,9 @@
   "description": "Voice recognition with AI integration",
   "main": "index.html",
   "scripts": {
-    "dev": "vercel dev",
+    "dev": "npx http-server -p 3000 --cors",
     "build": "echo 'No build step needed'",
-    "start": "vercel dev"
+    "start": "npx http-server -p 3000 --cors"
   },
   "dependencies": {
     "openai": "^4.20.1"

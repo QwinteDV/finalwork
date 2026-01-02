@@ -10,31 +10,44 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No message provided' });
     }
 
-    const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
-    const model = process.env.OLLAMA_MODEL || 'qwen3:4b';
+    const groqApiKey = process.env.GROQ_API_KEY;
+    
+    if (!groqApiKey) {
+      return res.status(500).json({ error: 'Groq API key not configured' });
+    }
 
-    const response = await fetch(`${ollamaUrl}/api/generate`, {
+    const model = process.env.GROQ_MODEL || 'qwen-2.5-7b-instruct';
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${groqApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model: model,
-        prompt: `Je bent een behulpzame AI assistent die antwoord geeft in het Nederlands. Wees kort en duidelijk.\n\nGebruiker: ${message}\n\nAssistent:`,
-        stream: false,
-        options: {
-          temperature: 0.7,
-          num_predict: 150
-        }
+        messages: [
+          {
+            role: 'system',
+            content: 'Je bent een behulpzame AI assistent die antwoord geeft in het Nederlands. Wees kort en duidelijk.'
+          },
+          {
+            role: 'user',
+            content: message
+          }
+        ],
+        max_tokens: 150,
+        temperature: 0.7
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Ollama API error: ${response.status}`);
+      const errorData = await response.text();
+      throw new Error(`Groq API error: ${response.status} - ${errorData}`);
     }
 
     const data = await response.json();
-    const aiResponse = data.response;
+    const aiResponse = data.choices[0].message.content;
 
     return res.status(200).json({ 
       response: aiResponse 
@@ -43,7 +56,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Chat error:', error);
     return res.status(500).json({ 
-      error: error.message || 'AI response failed' 
+      error: error.message || 'AI response failed'
     });
   }
 }

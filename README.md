@@ -1,6 +1,6 @@
 # Voice Recognition AI
 
-Voice recognition website met OpenAI integratie via Vercel Functions.
+Voice recognition website met Groq AI integratie via Vercel Functions.
 
 ## Setup
 
@@ -10,10 +10,12 @@ Voice recognition website met OpenAI integratie via Vercel Functions.
    vercel
    ```
 
-2. **OpenAI API key toevoegen:**
-   - Ga naar Vercel dashboard
-   - Project settings → Environment Variables
-   - Voeg toe: `OPENAI_API_KEY` met je OpenAI key
+2. **Groq API key toevoegen:**
+   - Ga naar https://console.groq.com/keys
+   - Maak een API key aan
+   - Ga naar Vercel dashboard → Project settings → Environment Variables
+   - Voeg toe: `GROQ_API_KEY` met je Groq key
+   - Optioneel: `GROQ_MODEL` (default: `qwen-2.5-7b-instruct`)
 
 3. **Local testen:**
    ```bash
@@ -25,7 +27,7 @@ Voice recognition website met OpenAI integratie via Vercel Functions.
 
 - Klik microfoon → neem audio op
 - Audio → `/api/transcribe` → OpenAI Whisper
-- Tekst → `/api/chat` → OpenAI GPT
+- Tekst → `/api/chat` → Groq AI (Qwen model)
 - Reactie verschijnt in AI balk
 
 ## Bestanden
@@ -34,6 +36,6 @@ Voice recognition website met OpenAI integratie via Vercel Functions.
 - `script.js` - Audio recording & API calls
 - `style.css` - Styling
 - `api/transcribe.js` - Whisper API
-- `api/chat.js` - GPT API
+- `api/chat.js` - Groq API
 - `package.json` - Dependencies
 - `vercel.json` - Vercel config

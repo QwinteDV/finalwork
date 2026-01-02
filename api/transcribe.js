@@ -1,4 +1,4 @@
-import formidable from 'formidable';
+import { Formidable } from 'formidable';
 import fs from 'fs';
 
 export const config = {

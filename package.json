@@ -8,9 +8,7 @@
     "build": "echo 'No build step needed'",
     "start": "npx http-server -p 3000 --cors"
   },
-  "dependencies": {
-    "openai": "^4.20.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "vercel": "^32.4.1"
   },
